@@ -1,53 +1,105 @@
+const fs = require('fs');
 
-class Usuario {
-    constructor(nombre, apellido) {
+class Contenedor {
+    constructor(nombre) {
         this.nombre = nombre;
-        this.apellido = apellido;
     }
 
-    getFullName() {
-        console.log(`Nombre y Apellido: ${this.nombre} ${this.apellido}`)
+    async save(data) {
+        try {
+            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf8`);
+            const productos = JSON.parse(contenido);
+
+            const nuevoProducto = {
+                producto: data.producto,
+                marca: data.marca,
+                precio: data.precio,
+                id: productos[productos.length - 1].id + 1
+            }
+
+            productos.push(nuevoProducto);
+
+            const dato = JSON.stringify(productos, null, '\t');
+            await fs.promises.writeFile(`./${this.nombre}`, dato);
+            console.log('Guardado');
+        }
+        catch (error) {
+            console.log('Error al guardar el objeto', error);
+        }
+    }
+    
+    async getById(id) {
+        try {
+            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
+            const productos = JSON.parse(contenido);
+
+            const indice = productos.findIndex((unProducto) => unProducto.id === id);
+
+            if (indice < 0) {
+                throw new Error('El producto no existe');
+            }
+
+            console.log(productos[indice]);
+        }
+        catch (error) {
+            console.log('No se encontro el producto', error)
+        }
     }
 
-    addMascota(mascota) {
-        arrayMascotas.push(mascota)
+    async getAll() {
+        try {
+            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
+            const productos = JSON.parse(contenido);
+            console.log(productos);
+        }
+        catch (error) {
+            console.log('No se encontro el array de los productos', error)
+        }
     }
 
-    countMascotas() {
-        console.log(`Cantidad de Mascotas: ${arrayMascotas.length}`)
+    async deleteById(id) {
+        try {
+            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
+            const productos = JSON.parse(contenido);
+
+            const indice = productos.findIndex((unProducto) => unProducto.id === id);
+
+            if (indice < 0) {
+                return;
+            }
+
+            productos.splice(indice, 1);
+
+            const dato = JSON.stringify(productos, null, '\t');
+            await fs.promises.writeFile(`./${this.nombre}`, dato);
+            console.log('Producto eliminado')
+        }
+        catch (error) {
+            console.log('No se encontro el producto', error)
+        }
     }
 
-    addBook(nombre, autor) {
-        arrayLibros.push({ Nombre : nombre, Autor: autor})
+    async deleteAll() {
+        try {
+            const productos = []
+            const dato = JSON.stringify(productos, null, '\t');
+            await fs.promises.writeFile(`./${this.nombre}`, dato);
+            console.log('Objetos eliminados');
+        }
+        catch (error) {
+            console.log('Error al eliminar los objetos', error);
+        }
+    }
     }
 
-    getBookNames() {
-        console.log(arrayLibros.map((el) => el.Nombre ))
-        
-    }
-}
+const container = new Contenedor ('productos.json');
 
-const arrayMascotas = [];
+// container.save({ producto: 'Ozelia', marca: 'Adidas', precio: 26000 });
 
-const arrayLibros = [];
+// container.getAll();
 
+// container.getById(2);
 
-const usuario1 = new Usuario("Miguel", "Avalle")
+// container.deleteById(3);
 
-//MASCOTAS
-usuario1.addMascota("Perro")
-usuario1.addMascota("Gato")
-usuario1.addMascota("Tortuga")
-
-//LIBROS 
-usuario1.addBook("El principito", "Antoine de Saint-Exupéry")
-usuario1.addBook("Don Quijote de la Mancha", "Miguel de Cervantes")
-usuario1.addBook("Cien años de soledad", "Gabriel García Márquez")
-
-
-usuario1.getFullName()
-
-usuario1.countMascotas()
-
-usuario1.getBookNames()
-
+// container.deleteAll();

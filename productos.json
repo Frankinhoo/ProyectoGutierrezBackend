@@ -1,0 +1,14 @@
+[
+	{
+		"producto": "Vapormax",
+		"marca": "Nike",
+		"precio": 48000,
+		"id": 1
+	},
+	{
+		"producto": "Superstar",
+		"marca": "Adidas",
+		"precio": 25000,
+		"id": 2
+	}
+]
