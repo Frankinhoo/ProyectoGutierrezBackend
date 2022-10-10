@@ -1,4 +1,8 @@
 const fs = require('fs');
+const express = require('express');
+
+const app = express();
+const PORT = 8080;
 
 class Contenedor {
     constructor(nombre) {
@@ -27,7 +31,7 @@ class Contenedor {
             console.log('Error al guardar el objeto', error);
         }
     }
-    
+
     async getById(id) {
         try {
             const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
@@ -39,7 +43,7 @@ class Contenedor {
                 throw new Error('El producto no existe');
             }
 
-            console.log(productos[indice]);
+            return(productos[indice]);
         }
         catch (error) {
             console.log('No se encontro el producto', error)
@@ -50,7 +54,7 @@ class Contenedor {
         try {
             const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
             const productos = JSON.parse(contenido);
-            console.log(productos);
+            return (productos);
         }
         catch (error) {
             console.log('No se encontro el array de los productos', error)
@@ -90,16 +94,39 @@ class Contenedor {
             console.log('Error al eliminar los objetos', error);
         }
     }
+
+    async productRandom() {
+        try {
+            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
+            const productos = JSON.parse(contenido);
+
+            const between = (min, max) => {
+                return Math.round(Math.random() * (max - min) + min);
+            }
+
+            return (between(1, productos.length));
+        }
+        catch (error) {
+            console.log('Error en retornar un numero aleatorio', error)
+        }
     }
+}
 
-const container = new Contenedor ('productos.json');
+const container = new Contenedor('productos.json');
 
-// container.save({ producto: 'Ozelia', marca: 'Adidas', precio: 26000 });
+app.get('/productos', async (req, res) => {
+    const productos = await container.getAll();
+    res.send(productos);
+});
 
-// container.getAll();
+app.get('/productoRandom', async (req, res) => {
+    const numeroAleatorio = await container.productRandom()
+    const productoAleatorio = await container.getById(numeroAleatorio)
+    res.send(productoAleatorio);
+})
 
-// container.getById(2);
+const server = app.listen(PORT, () => {
+    console.log(`Servidor http escuchando en el puerto ${server.address().port}`)
+})
 
-// container.deleteById(3);
-
-// container.deleteAll();
+server.on('error', error => console.log(`Error en el servidor ${error}`))

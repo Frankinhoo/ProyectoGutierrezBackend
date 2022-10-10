@@ -10,5 +10,35 @@
 		"marca": "Adidas",
 		"precio": 25000,
 		"id": 2
+	},
+	{
+		"producto": "Ozelia",
+		"marca": "Adidas",
+		"precio": 26000,
+		"id": 3
+	},
+	{
+		"producto": "Ozweego",
+		"marca": "Adidas",
+		"precio": 28000,
+		"id": 4
+	},
+	{
+		"producto": "Air max 720",
+		"marca": "Nike",
+		"precio": 39000,
+		"id": 5
+	},
+	{
+		"producto": "Air max 95",
+		"marca": "Nike",
+		"precio": 56000,
+		"id": 6
+	},
+	{
+		"producto": "Air max 97",
+		"marca": "Nike",
+		"precio": 69000,
+		"id": 7
 	}
 ]
