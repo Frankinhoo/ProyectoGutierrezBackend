@@ -26,13 +26,13 @@
 	{
 		"producto": "Air max 720",
 		"marca": "Nike",
-		"precio": 39000,
+		"precio": 49000,
 		"id": 5
 	},
 	{
 		"producto": "Air max 95",
 		"marca": "Nike",
-		"precio": 56000,
+		"precio": 57000,
 		"id": 6
 	},
 	{
@@ -40,5 +40,11 @@
 		"marca": "Nike",
 		"precio": 69000,
 		"id": 7
+	},
+	{
+		"producto": "Yung-1",
+		"marca": "Adidas",
+		"precio": 45000,
+		"id": 8
 	}
 ]
