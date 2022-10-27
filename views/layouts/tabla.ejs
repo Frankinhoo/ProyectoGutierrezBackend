@@ -1,0 +1,25 @@
+<table style="width:50%; border-collapse: collapse">
+    <tr style="background: black; color:white; border: black 2px solid  ">
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Marca</th>
+        <th>Precio</th>
+    </tr>
+    <% productos.forEach(elemento => { %>
+        <tr style="border: black 2px solid; text-align:center;" >
+            <td>
+                <%= elemento.id %>
+            </td>
+            <td>
+                <%= elemento.producto %>
+            </td>
+            <td>
+                <%= elemento.marca %>
+            </td>
+            <td>
+                <%= elemento.precio %>
+            </td>
+        </tr>
+        <% }) %>
+</table>
+<a href="http://localhost:8080"><button> Ir al formulario </button></a>
