@@ -1,16 +1,20 @@
 const express = require('express');
 const { urlencoded } = require('express');
 const { productosController } = require('../controller/productos')
+const {initWsServer} = require('./socket')
+const http = require('http');
 const path = require('path');
+
 
 const mainRouter = require('../routes/index')
 
 const app = express();
+const server = http.Server(app);
+initWsServer(server)
 
 app.use(express.static('public'));
 
 const pathViews = path.resolve(__dirname, '../../views')
-
 app.set('view engine', 'ejs');
 app.set('views', pathViews);
 
@@ -24,4 +28,5 @@ app.get('/', async (req, res) => {
     res.render('index', {productos})
 });
 
-module.exports = app;
+
+module.exports = server;

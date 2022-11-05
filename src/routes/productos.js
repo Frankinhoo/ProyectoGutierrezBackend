@@ -4,10 +4,10 @@ const { error } = require('console');
 
 const rutaProductos = Router();
 
-rutaProductos.get('/', async (req, res) => {
-    const productos = await productosController.getAll();
-    res.render('productos', { productos } );
-});
+// rutaProductos.get('/', async (req, res) => {
+//     // const productos = await productosController.getAll();
+//     // res.render('index', { productos } );
+// });
 
 rutaProductos.get('/:id', async (req, res) => {
     const id = parseInt(req.params.id);
@@ -25,18 +25,18 @@ rutaProductos.get('/:id', async (req, res) => {
     });
 })
 
-rutaProductos.post('/', async (req, res) => {
-    const data = req.body;
-    const producto = await productosController.save(data);
+// rutaProductos.post('/', async (req, res) => {
+//     // const data = req.body;
+//     // const producto = await productosController.save(data);
 
-    if (!data.producto || !data.marca || !data.precio) {
-        return res.status(400).json({
-            msg: "Campos incompletos"
-        })
-    }
+//     // if (!data.producto || !data.marca || !data.precio) {
+//     //     return res.status(400).json({
+//     //         msg: "Campos incompletos"
+//     //     })
+//     // }
 
-    res.redirect('/');
-})
+//     // res.redirect('/');
+// })
 
 rutaProductos.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id);

@@ -1,11 +1,43 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
-    <%- include('./layouts/formulario.ejs') %> 
+    <%- include('./layouts/formulario.ejs') %>
+        <h1>PRODUCTOS</h1>
+        <% if (productos.length> 0 ) { %>
+            <table style="width:50%; border-collapse: collapse;">
+                <tr style="background: black; color:white; border: black 2px solid  ">
+                    <th>ID</th>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Precio</th>
+                </tr>
+            </table>
+            
+            <div id="productos"></div>
+            <!-- <%- include('./layouts/tabla.ejs') %> -->
+        <% } else { %>
+            <p>No hay productos</p>
+        <% } %>
+
+        <div style="border: black 2px solid; width: 50%; margin-top: 35px;">
+            <ul id="mensajes"></ul>
+            
+            <div>
+                <form id="formMensajes" action="">
+                    <input id="inputUsuario" autocomplete="off" placeholder="Email" required />
+                    <input id="inputMensajes" autocomplete="off" placeholder="Ingrese mensaje" required /><input type="submit">
+                </form>
+            </div>
+        </div>
+
+    <script src="../socket.io/socket.io.js"></script>
+    <script src="../js/main.js"></script>
 </body>
 </html>
