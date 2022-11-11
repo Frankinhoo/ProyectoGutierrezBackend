@@ -11,22 +11,22 @@
     <%- include('./layouts/formulario.ejs') %>
         <h1>PRODUCTOS</h1>
         <% if (productos.length> 0 ) { %>
-            <table style="width:50%; border-collapse: collapse;">
+            <!-- <table style="width:50%; border-collapse: collapse;">
                 <tr style="background: black; color:white; border: black 2px solid  ">
                     <th>ID</th>
                     <th>Producto</th>
                     <th>Marca</th>
                     <th>Precio</th>
                 </tr>
-            </table>
+            </table> -->
             
-            <div id="productos"></div>
-            <!-- <%- include('./layouts/tabla.ejs') %> -->
+            <!-- <div id="productos"></div> -->
+            <%- include('./layouts/tabla.ejs') %>
         <% } else { %>
             <p>No hay productos</p>
         <% } %>
 
-        <div style="border: black 2px solid; width: 50%; margin-top: 35px;">
+        <!-- <div style="border: black 2px solid; width: 50%; margin-top: 35px;">
             <ul id="mensajes"></ul>
             
             <div>
@@ -35,9 +35,9 @@
                     <input id="inputMensajes" autocomplete="off" placeholder="Ingrese mensaje" required /><input type="submit">
                 </form>
             </div>
-        </div>
+        </div> -->
 
-    <script src="../socket.io/socket.io.js"></script>
+    <!-- <script src="../socket.io/socket.io.js"></script> -->
     <script src="../js/main.js"></script>
 </body>
 </html>

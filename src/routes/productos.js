@@ -1,13 +1,23 @@
 const { Router } = require('express');
 const { productosController } = require('../controller/productos')
 const { error } = require('console');
+const { administrador } = require("../config/index")
 
 const rutaProductos = Router();
 
-// rutaProductos.get('/', async (req, res) => {
-//     // const productos = await productosController.getAll();
-//     // res.render('index', { productos } );
-// });
+const autorizacion = (req, res, next) => {
+    if (!administrador)
+        return res.status(401).json({
+            msg: 'No estas autorizado'
+        });
+    
+    next();
+}
+
+rutaProductos.get('/', async  (req, res) => {
+    const productos = await productosController.getAll();
+    res.render('productos', { productos } );
+});
 
 rutaProductos.get('/:id', async (req, res) => {
     const id = parseInt(req.params.id);
@@ -19,26 +29,30 @@ rutaProductos.get('/:id', async (req, res) => {
         })
     }
 
-    res.json({
-        msg: `Producto con id ${id}`,
-        data: producto,
-    });
-})
+    // res.json({
+    //     msg: `Producto actualizado con id ${id}`,
+    //     data: producto
+    // })
 
-// rutaProductos.post('/', async (req, res) => {
-//     // const data = req.body;
-//     // const producto = await productosController.save(data);
+    res.render('producto', { producto });
+});
 
-//     // if (!data.producto || !data.marca || !data.precio) {
-//     //     return res.status(400).json({
-//     //         msg: "Campos incompletos"
-//     //     })
-//     // }
+rutaProductos.post('/', autorizacion, async (req, res) => {
+    const data = req.body;
+    const producto = await productosController.save(data);
 
-//     // res.redirect('/');
-// })
+    if (!data.producto || !data.marca || !data.precio) {
+        return res.status(400).json({
+            msg: "Campos incompletos"
+        })
+    }
+    res.status(201).json({
+        msg: "Producto Guardado"
+    })
+    // res.redirect('/');
+});
 
-rutaProductos.put('/:id', async (req, res) => {
+rutaProductos.put('/:id', autorizacion, async (req, res) => {
     const id = parseInt(req.params.id);
     const data = req.body;
 
@@ -61,9 +75,9 @@ rutaProductos.put('/:id', async (req, res) => {
         data: data
     })
 
-})
+});
 
-rutaProductos.delete('/:id', async (req, res) => {
+rutaProductos.delete('/:id', autorizacion, async (req, res) => {
     const id = parseInt(req.params.id);
     const producto = productosController.deleteById(id)
 
@@ -76,6 +90,6 @@ rutaProductos.delete('/:id', async (req, res) => {
     res.json({
         msg: `Producto borrado con id ${id}`
     })
-})
+});
 
 module.exports = rutaProductos;

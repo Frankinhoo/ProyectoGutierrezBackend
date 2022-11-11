@@ -40,11 +40,5 @@
 		"marca": "Nike",
 		"precio": 69000,
 		"id": 7
-	},
-	{
-		"producto": "Air max 95",
-		"marca": "Nike",
-		"precio": 85000,
-		"id": 8
 	}
 ]
