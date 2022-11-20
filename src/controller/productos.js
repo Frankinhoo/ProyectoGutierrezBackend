@@ -1,152 +1,134 @@
-const fs = require('fs');
+const { DBService } = require('../services/db');
 
-class Contenedor {
-    constructor(nombre) {
-        this.nombre = nombre;
+const checkBodyProduct = async (req, res, next) => {
+    const { nombre, marca, stock, precio} = req.body;
+
+    if (!nombre || !marca || !stock || !precio)
+        return res.status(400).json({
+            msg: 'Datos incompletos',
+        });
+
+    next();
+};
+
+const getAllProducts = async (req, res) => {
+    try {
+        const productos = await DBService.listaProductos();
+
+        res.json({
+            data: productos,
+        });
+    } catch (err) {
+        res.status(500).json({
+            error: err.message,
+            stack: err.stack,
+        });
     }
+};
 
-    async save(data) {
-        try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf8`);
-            const productos = JSON.parse(contenido);
+const getProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-            const nuevoProducto = {
-                producto: data.producto,
-                marca: data.marca,
-                precio: parseInt(data.precio),
-                id: productos[productos.length - 1].id + 1
-            }
+        const producto = await DBService.listaProductos(id);
 
-            if (!data.producto || !data.marca || !data.precio) {
-                throw new Error('Campos incompletos');
-            }
+        if (!producto.length)
+            return res.status(404).json({
+                msgs: 'Producto no encontrado',
+            });
 
-            productos.push(nuevoProducto);
-
-            const dato = JSON.stringify(productos, null, '\t');
-            await fs.promises.writeFile(`./${this.nombre}`, dato);
-            console.log('Guardado');
-        }
-        catch (error) {
-            console.log('Error al guardar el objeto', error);
-        }
+        res.json({
+            data: producto,
+        });
+    } catch (err) {
+        res.status(500).json({
+            error: err.message,
+            stack: err.stack,
+        });
     }
+};
 
-    async getById(id) {
-        try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
-            const productos = JSON.parse(contenido);
+const createProduct = async (req, res) => {
+    try {
+        const { nombre, marca, stock, precio } = req.body;
 
-            const indice = productos.findIndex((unProducto) => unProducto.id === id);
+        const data = {
+            nombre,
+            marca,
+            stock,
+            precio,
+        };
 
-            if (indice < 0) {
-                throw new Error('El producto no existe');
-            }
+        const newId = await DBService.crearProducto(data);
 
-            return (productos[indice]);
-        }
-        catch (error) {
-            console.log('No se encontro el producto', error)
-        }
+        const newProduct = await DBService.listaProductos(newId);
+
+        res.json({
+            data: newProduct,
+        });
+    } catch (err) {
+        res.status(500).json({
+            error: err.message,
+            stack: err.stack,
+        });
     }
+};
 
-    async getAll() {
-        try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
-            const productos = JSON.parse(contenido);
-            return (productos);
-        }
-        catch (error) {
-            console.log('No se encontro el array de los productos', error)
-        }
+const updateProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, marca, stock, precio } = req.body;
+
+        let productos = await DBService.listaProductos(id);
+
+        if (!productos.length)
+            return res.status(404).json({
+                msgs: 'Producto no encontrado',
+            });
+
+        const data = {
+            nombre,
+            marca,
+            stock,
+            precio,
+        };
+
+        DBService.actualizarProducto(id, data);
+
+        productos = await DBService.listaProductos(id);
+        res.json({
+            msg: 'Producto Actualizado',
+            item: productos,
+        });
+    } catch (err) {
+        res.status(500).json({
+            error: err.message,
+            stack: err.stack,
+        });
     }
+};
 
-    async deleteById(id) {
-        try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
-            const productos = JSON.parse(contenido);
+const deleteProduct = async (req, res) => { 
+    try {
+        const { id } = req.params;
 
-            const indice = productos.findIndex((unProducto) => unProducto.id === id);
-
-            if (indice < 0) {
-                return;
-            }
-
-            productos.splice(indice, 1);
-
-            const dato = JSON.stringify(productos, null, '\t');
-            await fs.promises.writeFile(`./${this.nombre}`, dato);
-            console.log('Producto eliminado')
-        }
-        catch (error) {
-            console.log('No se encontro el producto', error)
-        }
+        DBService.eliminarProducto(id);
+        res.json({
+            msg: 'Producto eliminado',
+        });
+    } catch (err) {
+        res.status(500).json({
+            error: err.message,
+            stack: err.stack,
+        });
     }
-
-    async deleteAll() {
-        try {
-            const productos = []
-            const dato = JSON.stringify(productos, null, '\t');
-            await fs.promises.writeFile(`./${this.nombre}`, dato);
-            console.log('Objetos eliminados');
-        }
-        catch (error) {
-            console.log('Error al eliminar los objetos', error);
-        }
-    }
-
-    async productRandom() {
-        try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
-            const productos = JSON.parse(contenido);
-
-            const between = (min, max) => {
-                return Math.round(Math.random() * (max - min) + min);
-            }
-
-            return (between(1, productos.length));
-        }
-        catch (error) {
-            console.log('Error en retornar un numero aleatorio', error)
-        }
-    }
-
-    async actualizarProduct(data, id) {
-        try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf8`);
-            const productos = JSON.parse(contenido);
-
-            const indice = productos.findIndex((unProducto) => unProducto.id === id);
-
-            const nuevoProducto = {
-                producto: data.producto,
-                marca: data.marca,
-                precio: data.precio,
-                id: productos[indice].id
-            }
-
-            if (indice < 0) {
-                throw new Error('El producto no existe');
-            }
-
-            if (!data.producto || !data.marca || !data.precio) {
-                throw new Error('Campos incompletos');
-            }
-
-            productos.splice(indice, 1, nuevoProducto);
-
-            const dato = JSON.stringify(productos, null, '\t');
-            await fs.promises.writeFile(`./${this.nombre}`, dato);
-            console.log('Guardado');
-        }
-        catch (error) {
-            console.log('Error al guardar el objeto', error);
-        }
-    }
-}
-
-const contenedorApi = new Contenedor('productos.json');
+};
 
 module.exports = {
-    productosController: contenedorApi
+    checkBodyProduct,
+    getAllProducts,
+    getProductById,
+    createProduct,
+    updateProduct,
+    deleteProduct
 }

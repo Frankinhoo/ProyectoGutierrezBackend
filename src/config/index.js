@@ -1,4 +1,4 @@
 module.exports = {
-    administrador: true,
+    administrador: false,
     puerto : process.env.PORT || 8080,
 }
