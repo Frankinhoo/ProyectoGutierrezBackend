@@ -1,7 +1,7 @@
 const knex = require('knex');
 const db = require('../knexfile');
-const dotenv = require('dotenv');
-dotenv.config();
+
+
 
 class Contenedor {
     constructor() {

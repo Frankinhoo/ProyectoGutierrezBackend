@@ -19,7 +19,7 @@ const middlewarePost = (req, res, next) => {
         })
     };
 
-    if (!data.producto || !data.marca || !data.precio) {
+    if (!data.producto || !data.marca || !data.precio || !data.stock) {
         return res.status(400).json({
             msg: "Campos incompletos"
         })
@@ -37,7 +37,7 @@ const middlewarePut = (req, res, next) => {
         })
     }
 
-    if (!data.producto || !data.marca || !data.precio) {
+    if (!data.producto || !data.marca || !data.precio || !data.stock) {
         return res.status(400).json({
             msg: "Campos incompletos"
         })

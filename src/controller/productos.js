@@ -1,9 +1,9 @@
 const { DBService } = require('../services/db');
 
 const checkBodyProduct = async (req, res, next) => {
-    const { nombre, marca, stock, precio} = req.body;
+    const { producto, marca, stock, precio} = req.body;
 
-    if (!nombre || !marca || !stock || !precio)
+    if (!producto || !marca || !stock || !precio)
         return res.status(400).json({
             msg: 'Datos incompletos',
         });
@@ -50,10 +50,10 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const { nombre, marca, stock, precio } = req.body;
+        const { producto, marca, stock, precio } = req.body;
 
         const data = {
-            nombre,
+            producto,
             marca,
             stock,
             precio,
@@ -77,7 +77,7 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, marca, stock, precio } = req.body;
+        const { producto, marca, stock, precio } = req.body;
 
         let productos = await DBService.listaProductos(id);
 
@@ -87,7 +87,7 @@ const updateProduct = async (req, res) => {
             });
 
         const data = {
-            nombre,
+            producto,
             marca,
             stock,
             precio,

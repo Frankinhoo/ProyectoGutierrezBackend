@@ -1,7 +1,7 @@
 const express = require('express');
 const { urlencoded } = require('express');
 const { productosController } = require('../controller/productos')
-const {initWsServer} = require('./socket')
+const { initWsServer } = require('./socket');
 const http = require('http');
 const path = require('path');
 
