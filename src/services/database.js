@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+const { MONGO_CONNECTION_STRING } = require('../config/index');
 
 
-const connectionString = process.env.MONGO_ATLAS_SRV || 'mongodb://localhost:27017/ecommerce'
+const connectionString = MONGO_CONNECTION_STRING;
 
 const initMongoDB = async () => {
     try {

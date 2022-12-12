@@ -7,317 +7,275 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-var fs = require('fs');
+var _require = require('../models/productos'),
+  productosModel = _require.productosModel;
+var _require2 = require('../utils/productosFaker'),
+  crearProducto = _require2.crearProducto;
 var Contenedor = /*#__PURE__*/function () {
-  function Contenedor(nombre) {
+  function Contenedor() {
     _classCallCheck(this, Contenedor);
-    this.nombre = nombre;
   }
   _createClass(Contenedor, [{
-    key: "save",
+    key: "getAll",
     value: function () {
-      var _save = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(data) {
-        var contenido, productos, nuevoProducto, dato;
+      var _getAll = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(req, res) {
+        var productos;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.prev = 0;
                 _context.next = 3;
-                return fs.promises.readFile("./".concat(this.nombre), "utf8");
+                return productosModel.find();
               case 3:
-                contenido = _context.sent;
-                productos = JSON.parse(contenido);
-                nuevoProducto = {
-                  producto: data.producto,
-                  marca: data.marca,
-                  precio: parseInt(data.precio),
-                  id: productos[productos.length - 1].id + 1
-                };
-                if (!(!data.producto || !data.marca || !data.precio)) {
-                  _context.next = 8;
-                  break;
-                }
-                throw new Error('Campos incompletos');
-              case 8:
-                productos.push(nuevoProducto);
-                dato = JSON.stringify(productos, null, '\t');
-                _context.next = 12;
-                return fs.promises.writeFile("./".concat(this.nombre), dato);
-              case 12:
-                console.log('Guardado');
-                _context.next = 18;
+                productos = _context.sent;
+                res.json({
+                  data: productos
+                });
+                _context.next = 10;
                 break;
-              case 15:
-                _context.prev = 15;
+              case 7:
+                _context.prev = 7;
                 _context.t0 = _context["catch"](0);
-                console.log('Error al guardar el objeto', _context.t0);
-              case 18:
+                res.status(500).json({
+                  error: _context.t0.message,
+                  stack: _context.t0.stack
+                });
+              case 10:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this, [[0, 15]]);
+        }, _callee, null, [[0, 7]]);
       }));
-      function save(_x) {
-        return _save.apply(this, arguments);
-      }
-      return save;
-    }()
-  }, {
-    key: "getById",
-    value: function () {
-      var _getById = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(id) {
-        var contenido, productos, indice;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.prev = 0;
-                _context2.next = 3;
-                return fs.promises.readFile("./".concat(this.nombre), "utf-8");
-              case 3:
-                contenido = _context2.sent;
-                productos = JSON.parse(contenido);
-                indice = productos.findIndex(function (unProducto) {
-                  return unProducto.id === id;
-                });
-                if (!(indice < 0)) {
-                  _context2.next = 8;
-                  break;
-                }
-                throw new Error('El producto no existe');
-              case 8:
-                return _context2.abrupt("return", productos[indice]);
-              case 11:
-                _context2.prev = 11;
-                _context2.t0 = _context2["catch"](0);
-                console.log('No se encontro el producto', _context2.t0);
-              case 14:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this, [[0, 11]]);
-      }));
-      function getById(_x2) {
-        return _getById.apply(this, arguments);
-      }
-      return getById;
-    }()
-  }, {
-    key: "getAll",
-    value: function () {
-      var _getAll = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var contenido, productos;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.prev = 0;
-                _context3.next = 3;
-                return fs.promises.readFile("./".concat(this.nombre), "utf-8");
-              case 3:
-                contenido = _context3.sent;
-                productos = JSON.parse(contenido);
-                return _context3.abrupt("return", productos);
-              case 8:
-                _context3.prev = 8;
-                _context3.t0 = _context3["catch"](0);
-                console.log('No se encontro el array de los productos', _context3.t0);
-              case 11:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this, [[0, 8]]);
-      }));
-      function getAll() {
+      function getAll(_x, _x2) {
         return _getAll.apply(this, arguments);
       }
       return getAll;
     }()
   }, {
-    key: "deleteById",
+    key: "getById",
     value: function () {
-      var _deleteById = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(id) {
-        var contenido, productos, indice, dato;
+      var _getById = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(req, res) {
+        var id, producto;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.prev = 0;
+                id = req.params.id;
+                _context2.next = 4;
+                return productosModel.findById(id);
+              case 4:
+                producto = _context2.sent;
+                if (producto) {
+                  _context2.next = 7;
+                  break;
+                }
+                return _context2.abrupt("return", res.status(404).json({
+                  msg: 'Producto no encontrado'
+                }));
+              case 7:
+                res.json({
+                  data: producto
+                });
+                _context2.next = 13;
+                break;
+              case 10:
+                _context2.prev = 10;
+                _context2.t0 = _context2["catch"](0);
+                res.status(500).json({
+                  error: _context2.t0.message,
+                  stack: _context2.t0.stack
+                });
+              case 13:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, null, [[0, 10]]);
+      }));
+      function getById(_x3, _x4) {
+        return _getById.apply(this, arguments);
+      }
+      return getById;
+    }()
+  }, {
+    key: "create",
+    value: function () {
+      var _create = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(req, res) {
+        var _req$body, producto, marca, precio, stock, nuevoProducto;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.prev = 0;
+                _req$body = req.body, producto = _req$body.producto, marca = _req$body.marca, precio = _req$body.precio, stock = _req$body.stock;
+                _context3.next = 4;
+                return productosModel.create({
+                  producto: producto,
+                  marca: marca,
+                  precio: precio,
+                  stock: stock
+                });
+              case 4:
+                nuevoProducto = _context3.sent;
+                res.json({
+                  data: nuevoProducto
+                });
+                _context3.next = 11;
+                break;
+              case 8:
+                _context3.prev = 8;
+                _context3.t0 = _context3["catch"](0);
+                res.status(500).json({
+                  error: _context3.t0.message,
+                  stack: _context3.t0.stack
+                });
+              case 11:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, null, [[0, 8]]);
+      }));
+      function create(_x5, _x6) {
+        return _create.apply(this, arguments);
+      }
+      return create;
+    }()
+  }, {
+    key: "update",
+    value: function () {
+      var _update = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(req, res) {
+        var id, _req$body2, producto, marca, precio, stock, prdcto, productoActualizado;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.prev = 0;
-                _context4.next = 3;
-                return fs.promises.readFile("./".concat(this.nombre), "utf-8");
-              case 3:
-                contenido = _context4.sent;
-                productos = JSON.parse(contenido);
-                indice = productos.findIndex(function (unProducto) {
-                  return unProducto.id === id;
-                });
-                if (!(indice < 0)) {
+                id = req.params.id;
+                _req$body2 = req.body, producto = _req$body2.producto, marca = _req$body2.marca, precio = _req$body2.precio, stock = _req$body2.stock;
+                _context4.next = 5;
+                return productosModel.findById(id);
+              case 5:
+                prdcto = _context4.sent;
+                if (prdcto) {
                   _context4.next = 8;
                   break;
                 }
-                return _context4.abrupt("return");
+                return _context4.abrupt("return", res.status(404).json({
+                  msg: 'Producto no encontrado'
+                }));
               case 8:
-                productos.splice(indice, 1);
-                dato = JSON.stringify(productos, null, '\t');
-                _context4.next = 12;
-                return fs.promises.writeFile("./".concat(this.nombre), dato);
-              case 12:
-                console.log('Producto eliminado');
-                _context4.next = 18;
+                _context4.next = 10;
+                return productosModel.findByIdAndUpdate(id, {
+                  producto: producto,
+                  marca: marca,
+                  precio: precio,
+                  stock: stock
+                }, {
+                  "new": true
+                });
+              case 10:
+                productoActualizado = _context4.sent;
+                res.json({
+                  msg: 'Producto Actualizado',
+                  data: productoActualizado
+                });
+                _context4.next = 17;
                 break;
-              case 15:
-                _context4.prev = 15;
+              case 14:
+                _context4.prev = 14;
                 _context4.t0 = _context4["catch"](0);
-                console.log('No se encontro el producto', _context4.t0);
-              case 18:
+                res.status(500).json({
+                  error: _context4.t0.message,
+                  stack: _context4.t0.stack
+                });
+              case 17:
               case "end":
                 return _context4.stop();
             }
           }
-        }, _callee4, this, [[0, 15]]);
+        }, _callee4, null, [[0, 14]]);
       }));
-      function deleteById(_x3) {
-        return _deleteById.apply(this, arguments);
+      function update(_x7, _x8) {
+        return _update.apply(this, arguments);
       }
-      return deleteById;
+      return update;
     }()
   }, {
-    key: "deleteAll",
+    key: "delete",
     value: function () {
-      var _deleteAll = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var productos, dato;
+      var _delete2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(req, res) {
+        var id;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
                 _context5.prev = 0;
-                productos = [];
-                dato = JSON.stringify(productos, null, '\t');
-                _context5.next = 5;
-                return fs.promises.writeFile("./".concat(this.nombre), dato);
-              case 5:
-                console.log('Objetos eliminados');
-                _context5.next = 11;
+                id = req.params.id;
+                _context5.next = 4;
+                return productosModel.findByIdAndDelete(id);
+              case 4:
+                res.json({
+                  msg: 'Producto Eliminado'
+                });
+                _context5.next = 10;
                 break;
-              case 8:
-                _context5.prev = 8;
+              case 7:
+                _context5.prev = 7;
                 _context5.t0 = _context5["catch"](0);
-                console.log('Error al eliminar los objetos', _context5.t0);
-              case 11:
+                res.status(500).json({
+                  error: _context5.t0.message,
+                  stack: _context5.t0.stack
+                });
+              case 10:
               case "end":
                 return _context5.stop();
             }
           }
-        }, _callee5, this, [[0, 8]]);
+        }, _callee5, null, [[0, 7]]);
       }));
-      function deleteAll() {
-        return _deleteAll.apply(this, arguments);
+      function _delete(_x9, _x10) {
+        return _delete2.apply(this, arguments);
       }
-      return deleteAll;
+      return _delete;
     }()
   }, {
-    key: "productRandom",
+    key: "getAllFaker",
     value: function () {
-      var _productRandom = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var contenido, productos, between;
+      var _getAllFaker = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6(req, res) {
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                _context6.prev = 0;
-                _context6.next = 3;
-                return fs.promises.readFile("./".concat(this.nombre), "utf-8");
-              case 3:
-                contenido = _context6.sent;
-                productos = JSON.parse(contenido);
-                between = function between(min, max) {
-                  return Math.round(Math.random() * (max - min) + min);
-                };
-                return _context6.abrupt("return", between(1, productos.length));
-              case 9:
-                _context6.prev = 9;
-                _context6.t0 = _context6["catch"](0);
-                console.log('Error en retornar un numero aleatorio', _context6.t0);
-              case 12:
+                try {
+                  res.status(200).json({
+                    data: crearProducto(5)
+                  });
+                } catch (error) {
+                  res.status(500).json({
+                    error: error.message,
+                    stack: error.stack
+                  });
+                }
+              case 1:
               case "end":
                 return _context6.stop();
             }
           }
-        }, _callee6, this, [[0, 9]]);
+        }, _callee6);
       }));
-      function productRandom() {
-        return _productRandom.apply(this, arguments);
+      function getAllFaker(_x11, _x12) {
+        return _getAllFaker.apply(this, arguments);
       }
-      return productRandom;
-    }()
-  }, {
-    key: "actualizarProduct",
-    value: function () {
-      var _actualizarProduct = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7(data, id) {
-        var contenido, productos, indice, nuevoProducto, dato;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                _context7.prev = 0;
-                _context7.next = 3;
-                return fs.promises.readFile("./".concat(this.nombre), "utf8");
-              case 3:
-                contenido = _context7.sent;
-                productos = JSON.parse(contenido);
-                indice = productos.findIndex(function (unProducto) {
-                  return unProducto.id === id;
-                });
-                nuevoProducto = {
-                  producto: data.producto,
-                  marca: data.marca,
-                  precio: data.precio,
-                  id: productos[indice].id
-                };
-                if (!(indice < 0)) {
-                  _context7.next = 9;
-                  break;
-                }
-                throw new Error('El producto no existe');
-              case 9:
-                if (!(!data.producto || !data.marca || !data.precio)) {
-                  _context7.next = 11;
-                  break;
-                }
-                throw new Error('Campos incompletos');
-              case 11:
-                productos.splice(indice, 1, nuevoProducto);
-                dato = JSON.stringify(productos, null, '\t');
-                _context7.next = 15;
-                return fs.promises.writeFile("./".concat(this.nombre), dato);
-              case 15:
-                console.log('Guardado');
-                _context7.next = 21;
-                break;
-              case 18:
-                _context7.prev = 18;
-                _context7.t0 = _context7["catch"](0);
-                console.log('Error al guardar el objeto', _context7.t0);
-              case 21:
-              case "end":
-                return _context7.stop();
-            }
-          }
-        }, _callee7, this, [[0, 18]]);
-      }));
-      function actualizarProduct(_x4, _x5) {
-        return _actualizarProduct.apply(this, arguments);
-      }
-      return actualizarProduct;
+      return getAllFaker;
     }()
   }]);
   return Contenedor;
 }();
-var contenedorApi = new Contenedor('productos.json');
+var contenedorDBMongo = new Contenedor();
 module.exports = {
-  productosController: contenedorApi
+  mongoDBController: contenedorDBMongo
 };

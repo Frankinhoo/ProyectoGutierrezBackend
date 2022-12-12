@@ -1,7 +1,5 @@
 const { Router } = require('express');
-// const { carritoController } = require('../controller/carrito');
-const { carritoController } = require('../controller/carritoMongo');
-const { productosController } = require('../controller/productos');
+const { carritoController } = require('../controller/carrito');
 
 
 const rutaCarrito = Router();

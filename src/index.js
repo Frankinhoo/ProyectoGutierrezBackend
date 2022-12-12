@@ -1,10 +1,10 @@
 const server = require('./services/server');
 const { initWsServer, getWsServer } = require('./services/socket');
-const { puerto } = require('./config/index');
+const { PUERTO } = require('./config/index');
 const { DBService } = require('./services/db');
 const { initMongoDB } = require('./services/database');
-const dotenv = require('dotenv').config();
 
+const puerto = PUERTO
 // DBService.init();
 
 const init = async () => {

@@ -1,139 +1,181 @@
-const fs = require('fs');
+const { productosModel } = require('../models/productos');
+const { carritoModel } = require('../models/carrito');
 const moment = require('moment');
 
 class Contenedor {
-    constructor(nombre) {
-        this.nombre = nombre;
+    constructor() {
     }
 
-    async newCarrito() {
+    async newCarrito(req, res) {
         try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf8`);
-            const carrito = JSON.parse(contenido);
+            const timestamps = moment().format('DD-MM-YY HH:MM:SS')
+            const productos = [];
 
-            const between = (min, max) => {
-                return Math.round(Math.random() * (max - min) + min);
-            }
+            const carrito = await carritoModel.create({
+                timestamps,
+                productos
+            });
 
-            const nuevoCarrito = {
-                id: between(0, 1000),
-                timestamp: moment().format('DD-MM-YY HH:MM:SS'),
-                producto: []
-            }
-
-            carrito.push(nuevoCarrito);
-
-            const dato = JSON.stringify(carrito, null, '\t');
-            await fs.promises.writeFile(`./${this.nombre}`, dato);
-            console.log('Carrito creado');
-            return (nuevoCarrito.id);
+            res.status(201).json({
+                mensaje: `Carrito creado con exito`,
+                data: carrito,
+            });
+        } catch (error) {
+            res.status(500).json({
+            error: error.message,
+            stack: error.stack,
+            });
         }
-        catch (error) {
-            console.log('Error al crear carrito', error);
-        }
-    }
-    
-    async deleteCarritoById(cartId) {
-            try {
-                const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
-                const carrito = JSON.parse(contenido);
-    
-                const indice = carrito.findIndex((cart) => cart.id === cartId);
-    
-                if (indice < 0) {
-                    return;
-                }
-    
-                carrito.splice(indice, 1);
-    
-                const dato = JSON.stringify(carrito, null, '\t');
-                await fs.promises.writeFile(`./${this.nombre}`, dato);
-                console.log('Carrito eliminado')
-            }
-            catch (error) {
-                console.log('No se encontro el carrito', error)
-            }
-    }
+    };
 
-    async addNewProductToCartById(cartId, product) {
+    async deleteCartById(req, res) {
         try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf8`);
-            const carrito = JSON.parse(contenido);
+            const carritoId = req.params.id;
+            const carrito = await carritoModel.findByIdAndDelete(carritoId);
 
-            const indice = carrito.findIndex((cart) => cart.id === cartId);
+            if (!carrito)
+                return res.status(404).json({
+                    msg: 'Carrito no encontrado',
+                });
 
-            carrito[indice].producto.push(product);
-
-            const dato = JSON.stringify(carrito, null, '\t');
-            await fs.promises.writeFile(`./${this.nombre}`, dato);
+            res.json({
+                msg: 'Carrito Eliminado',
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
         }
-        catch (error) {
-            console.log('No se pudo agregar el producto al carrito', error)
-        }
-    }
+    };
 
-    async getCarritoById(cartId) {
+    async addNewProductToCartById(req, res) {
         try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
-            const carrito = JSON.parse(contenido);
+            const carritoId = req.params.id;
+            const productoId = req.body.id;
 
-            const indice = carrito.findIndex((cart) => cart.id === cartId);
+            const carrito = await carritoModel.findOne({ _id: carritoId });
 
-            if (indice < 0) {
-                const existente = {
-                    index: indice,
-                    msg: "El carrito buscado no existe!",
-                };
-                throw existente;
-            }
+            if (!carrito)
+                return res.status(404).json({
+                    msg: 'Carrito no encontrado'
+                });
+            
+            const producto = await productosModel.findOne({ _id: productoId });
+            
+            const productos = carrito.productos;
+            productos.push(producto);
 
-            return (carrito[indice]);
+            if (!producto)
+                return res.status(404).json({
+                    msg: 'Producto no encontrado'
+                });
+            
+            await carritoModel.findByIdAndUpdate(
+                carrito._id,
+                { productos },
+                { new: true }
+            );
+
+            res.status(201).json({
+                mensaje: 'Producto agregado al carrito',
+                data: producto,
+            })
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
         }
-        catch (error) {
-            console.log('No se encontro el Carrito', error)
-        }
-    }
+    };
 
-    async deleteProductoInCartById(cartId, productId) {
+    async getCartById(req, res) {
         try {
-            const contenido = await fs.promises.readFile(`./${this.nombre}`, `utf-8`);
-            const carrito = JSON.parse(contenido);
+            const carritoId = req.params.id;
 
-            const carritoIndice = carrito.findIndex((cart) => cart.id === cartId);
+            const carrito = await carritoModel.findOne({ _id: carritoId });
 
-            const productoIndice = carrito[carritoIndice].producto.findIndex((unProducto) => unProducto.id === productId);
-
-
-            if (productoIndice < 0) {
-                throw 'El producto no existe en el carrito';
-            }
-
-            carrito[carritoIndice].producto.splice(productoIndice, 1);
-
-            const dato = JSON.stringify(carrito, null, '\t');
-            await fs.promises.writeFile(`./${this.nombre}`, dato);
-            console.log('Producto eliminado')
+            if (!carrito)
+                return res.status(404).json({
+                    msg: 'Carrito no encontrado'
+                });
+            
+            res.status(200).json({
+                data: carrito,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
         }
-        catch (error) {
-            console.log('No se encontro el producto', error)
-        }
-    }
+    };
 
-    async deleteAll() {
+    async getAllCarts(req, res) {
         try {
-            const carritos = []
-            const dato = JSON.stringify(carritos, null, '\t');
-            await fs.promises.writeFile(`./${this.nombre}`, dato);
-            console.log('Objetos eliminados');
+            const carritos = await carritoModel.find();
+
+            if (!carritos)
+                return res.status(404).json({
+                    msg: 'Carritos no encontrados'
+                });
+
+            res.status(200).json({
+                data: carritos,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
         }
-        catch (error) {
-            console.log('Error al eliminar los objetos', error);
+    };
+
+    async deleteProductInCartById(req, res) {
+        try {
+            const carritoId = req.params.id;
+            const productoId = req.params.id_prod;
+
+            const carrito = await carritoModel.findOne({ _id: carritoId });
+
+            if (!carrito)
+                return res.status(404).json({
+                    msg: 'Carrito no encontrado'
+                });
+            
+            const productoExistente = carrito.productos.find((item) => item._id == productoId);
+            
+            if (!productoExistente)
+                return res.status(404).json({
+                    mensaje: "Producto no encontrado!",
+                });
+            
+            let productos = carrito.productos;
+            const productosFiltrados = carrito.productos.filter((item) => item._id != productoId);
+            productos = productosFiltrados;
+
+            const carritoActualizado = await carritoModel.findByIdAndUpdate(
+                carrito._id,
+                { productos },
+                { new: true }
+            );
+
+            res.status(201).json({
+                mensaje: 'Producto eliminado del carrito',
+                data: carritoActualizado,
+            })
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
         }
-    }
+    };
+
 }
 
 const contenedorCarrito = new Contenedor('carrito.json');
 
 module.exports = {
-    carritoController : contenedorCarrito
+    carritoController: contenedorCarrito
 }

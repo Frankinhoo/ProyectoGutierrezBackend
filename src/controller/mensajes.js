@@ -1,54 +1,84 @@
-const fs = require('fs');
-const path = require('path');
-const moment = require('moment');
+const { mensajesModel } = require('../models/mensajes');
+const { normalize, denormalize, schema } = require('normalizr');
+const { Schema } = require('mongoose');
+
+const autor = new schema.Entity('autor', {}, { idAttribute: 'id' });
+
+const msj = new schema.Entity(
+    'mensaje',
+    { autor: autor },
+    { idAttribute: '_id' }
+);
+
+const msjSchema = new schema.Array(msj);
 
 class Contenedor {
-    constructor(nombre) {
-        this.nombre = nombre;
+    constructor() {
     }
 
-    async getAll() {
+    async getAll(req, res) {
         try {
-            const viewsFolderPath = path.resolve(__dirname, '../../mensajes.json')
-            const contenido = await fs.promises.readFile(viewsFolderPath, `utf-8`);
-            const data = JSON.parse(contenido);
-            return (data);
-        }
-        catch (error) {
-            console.log('No se encontro el array de los mensajes', error)
-        }
-    }
+            const mensajes = await mensajesModel.find().lean();
 
-    async save(data) {
+            if (!mensajes) 
+                return res.status(400).json({
+                    mensaje: "No hay mensajes",
+                });
+            
+            res.status(200).json({
+                data: mensajes,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            })
+        }
+    };
+
+    async normalizedMessages(req, res) {
         try {
-            const viewsFolderPath = path.resolve(__dirname, '../../mensajes.json')
-            const contenido = await fs.promises.readFile(viewsFolderPath, `utf8`);
-            const datos = JSON.parse(contenido);
+            const mensajesOriginales = await mensajesModel.find().lean();
 
-            const nuevoMensaje = {
-                usuario: data.usuario,
-                mensaje: data.mensaje,
-                time: moment().format('L, h:mm a'),
-            }
+            const mensajesNormalizados = normalize(mensajesOriginales, msjSchema);
 
-            if (!data.usuario || !data.mensaje) {
-                throw new Error('Campos incompletos');
-            }
-
-            datos.push(nuevoMensaje);
-
-            const dato = JSON.stringify(datos, null, '\t');
-            await fs.promises.writeFile(viewsFolderPath, dato);
-            console.log('Enviado');
+            res.status(200).json({
+                data: mensajesNormalizados,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
         }
-        catch (error) {
-            console.log('Error al enviar el mensaje', error);
+    };
+
+    async denormalizedMessages(req, res) {
+        try {
+            const mensajesOriginales = await mensajesModel.find().lean();
+
+            const mensajesNormalizados = normalize(mensajesOriginales, msjSchema);
+
+            const denormalizado = denormalize(
+                mensajesNormalizados.result,
+                msjSchema,
+                mensajesNormalizados.entities
+            );
+
+            res.status(200).json({
+                data: denormalizado
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
         }
-    }
+    };
 }
 
-const contenedorMsj = new Contenedor('mensajes.json');
+const contenedorDBMongo = new Contenedor();
 
 module.exports = {
-    mensajesController : contenedorMsj
+    mensajesController: contenedorDBMongo
 }

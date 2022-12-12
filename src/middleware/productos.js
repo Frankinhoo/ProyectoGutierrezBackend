@@ -1,5 +1,15 @@
 const { administrador } = require("../config/index");
 
+const checkBodyProduct = async (req, res, next) => {
+    const { producto, marca, stock, precio } = req.body;
+
+    if (!producto || !marca || !stock || !precio)
+        return res.status(400).json({
+            msg: 'Datos incompletos',
+        });
+
+    next();
+};
 
 const middlewareGetId = (req, res, next) => {
     const id = parseInt(req.params.id);
@@ -60,5 +70,6 @@ module.exports = {
     middlewareGetId,
     middlewarePost,
     middlewarePut,
-    middlewareDelete
+    middlewareDelete,
+    checkBodyProduct
 }

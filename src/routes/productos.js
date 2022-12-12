@@ -1,9 +1,11 @@
 const { Router } = require('express');
-const { checkBodyProduct, getAllProducts, getProductById, createProduct, updateProduct, deleteProduct } = require('../controller/productos');
-const { mongoDBController } = require('../controller/productosMongo');
+const { checkBodyProduct } = require('../middleware/productos');
+const { mongoDBController } = require('../controller/productos');
 
 
 const rutaProductos = Router();
+
+rutaProductos.get('/test', mongoDBController.getAllFaker) //Eliminar despues 
 
 rutaProductos.get('/', mongoDBController.getAll);
 

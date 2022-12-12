@@ -1,134 +1,133 @@
-const { DBService } = require('../services/db');
+const { productosModel } = require('../models/productos');
+const { crearProducto } = require('../utils/productosFaker');
 
-const checkBodyProduct = async (req, res, next) => {
-    const { producto, marca, stock, precio} = req.body;
 
-    if (!producto || !marca || !stock || !precio)
-        return res.status(400).json({
-            msg: 'Datos incompletos',
-        });
-
-    next();
-};
-
-const getAllProducts = async (req, res) => {
-    try {
-        const productos = await DBService.listaProductos();
-
-        res.json({
-            data: productos,
-        });
-    } catch (err) {
-        res.status(500).json({
-            error: err.message,
-            stack: err.stack,
-        });
+class Contenedor{
+    constructor() {
     }
-};
 
-const getProductById = async (req, res) => {
-    try {
-        const { id } = req.params;
+    async getAll (req, res) {
+        try {
+            const productos = await productosModel.find();
+    
+            res.json({
+                data: productos,
+            });
+    
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            })
+        }
+    };
 
-        const producto = await DBService.listaProductos(id);
+    async getById (req, res) {
+        try {
+            const { id } = req.params;
+            const producto = await productosModel.findById(id);
 
-        if (!producto.length)
-            return res.status(404).json({
-                msgs: 'Producto no encontrado',
+            if (!producto)
+                return res.status(404).json({
+                    msg: 'Producto no encontrado'
+                });
+            
+            res.json({
+                data: producto,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
+        }
+    };
+
+    async create (req, res) {
+        try {
+            const { producto, marca, precio, stock } = req.body;
+
+            const nuevoProducto = await productosModel.create({
+                producto,
+                marca,
+                precio,
+                stock
             });
 
-        res.json({
-            data: producto,
-        });
-    } catch (err) {
-        res.status(500).json({
-            error: err.message,
-            stack: err.stack,
-        });
-    }
-};
-
-const createProduct = async (req, res) => {
-    try {
-        const { producto, marca, stock, precio } = req.body;
-
-        const data = {
-            producto,
-            marca,
-            stock,
-            precio,
-        };
-
-        const newId = await DBService.crearProducto(data);
-
-        const newProduct = await DBService.listaProductos(newId);
-
-        res.json({
-            data: newProduct,
-        });
-    } catch (err) {
-        res.status(500).json({
-            error: err.message,
-            stack: err.stack,
-        });
-    }
-};
-
-const updateProduct = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { producto, marca, stock, precio } = req.body;
-
-        let productos = await DBService.listaProductos(id);
-
-        if (!productos.length)
-            return res.status(404).json({
-                msgs: 'Producto no encontrado',
+            res.json({
+                data: nuevoProducto,
             });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
+        }
+    };
 
-        const data = {
-            producto,
-            marca,
-            stock,
-            precio,
-        };
+    async update (req, res) {
+        try {
+            const { id } = req.params;
+            const { producto, marca, precio, stock } = req.body;
 
-        DBService.actualizarProducto(id, data);
+            const prdcto = await productosModel.findById(id);
 
-        productos = await DBService.listaProductos(id);
-        res.json({
-            msg: 'Producto Actualizado',
-            item: productos,
-        });
-    } catch (err) {
-        res.status(500).json({
-            error: err.message,
-            stack: err.stack,
-        });
-    }
-};
+            if (!prdcto)
+                return res.status(404).json({
+                    msg: 'Producto no encontrado'
+                });
 
-const deleteProduct = async (req, res) => { 
-    try {
-        const { id } = req.params;
+            const productoActualizado = await productosModel.findByIdAndUpdate(
+                id,
+                { producto, marca, precio, stock },
+                { new: true }
+            );
 
-        DBService.eliminarProducto(id);
-        res.json({
-            msg: 'Producto eliminado',
-        });
-    } catch (err) {
-        res.status(500).json({
-            error: err.message,
-            stack: err.stack,
-        });
-    }
-};
+            res.json({
+                msg: 'Producto Actualizado',
+                data: productoActualizado,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
+        }
+    };
+
+    async delete (req, res) {
+        try {
+            const { id } = req.params;
+
+            await productosModel.findByIdAndDelete(id);
+
+            res.json({
+                msg: 'Producto Eliminado',
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
+        }
+    };
+
+    async getAllFaker (req, res) {
+        try {
+            res.status(200).json({
+                data: crearProducto(5),
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                stack: error.stack,
+            });
+        }
+    };
+}
+
+const contenedorDBMongo = new Contenedor();
 
 module.exports = {
-    checkBodyProduct,
-    getAllProducts,
-    getProductById,
-    createProduct,
-    updateProduct,
-    deleteProduct
+    mongoDBController: contenedorDBMongo
 }
