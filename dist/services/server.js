@@ -13,11 +13,51 @@ var _require3 = require('./socket'),
   initWsServer = _require3.initWsServer;
 var http = require('http');
 var path = require('path');
-var mainRouter = require('../routes/index');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var passport = require('passport');
+var MongoStore = require('connect-mongo');
+var _require4 = require('../config/index'),
+  MONGO_CONNECTION_STRING = _require4.MONGO_CONNECTION_STRING;
+var _require5 = require('./auth'),
+  loginFunc = _require5.loginFunc,
+  signUpFunc = _require5.signUpFunc;
 var app = express();
+var ttlSeconds = 180;
+
+//express-session
+var StoreOptions = {
+  store: MongoStore.create({
+    mongoUrl: MONGO_CONNECTION_STRING,
+    crypto: {
+      secret: '1234'
+    }
+  }),
+  secret: 'secretString',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: ttlSeconds * 1000
+  }
+};
+app.use(cookieParser());
+app.use(session(StoreOptions));
+
+//indicamos que vamos a usar passport en todas nuestras rutas
+app.use(passport.initialize());
+
+//permitimos que passport pueda manipular las sessiones de nuestra app
+app.use(passport.session());
+passport.use('login', loginFunc);
+passport.use('signup', signUpFunc);
+var mainRouter = require('../routes/index');
+var _require6 = require('dotenv'),
+  config = _require6.config;
 var server = http.Server(app);
 initWsServer(server);
 app.use(express["static"]('public'));
+
+//Config de plantillas ejs
 var pathViews = path.resolve(__dirname, '../../views');
 app.set('view engine', 'ejs');
 app.set('views', pathViews);

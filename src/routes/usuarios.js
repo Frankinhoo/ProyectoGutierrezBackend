@@ -1,16 +1,22 @@
+const passport = require('passport');
 const { Router } = require('express');
 const { usuariosController } = require('../controller/usuarios');
-const { validateLogIn } = require('../middleware/usuarios')
+const { isLoggedIn } = require('../middleware/usuarios');
+
 
 
 const rutaUsuarios = Router();
 
-rutaUsuarios.post('/login', usuariosController.loginPost)
+const passportOptions = {
+    badRequestMessage: "Problema con username / password!",
+};
 
-rutaUsuarios.get('/', usuariosController.loginGet)
+rutaUsuarios.post('/signup', usuariosController.signup)
 
-rutaUsuarios.get('/logout', usuariosController.logout)
+rutaUsuarios.post('/login', passport.authenticate("login", passportOptions), usuariosController.login)
 
-rutaUsuarios.get('/info', validateLogIn, usuariosController.info)
+rutaUsuarios.get('/home', isLoggedIn, usuariosController.info)
+
+rutaUsuarios.get('/logout', isLoggedIn, usuariosController.logout)
 
 module.exports = rutaUsuarios;

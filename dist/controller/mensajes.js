@@ -7,35 +7,61 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-var fs = require('fs');
-var path = require('path');
-var moment = require('moment');
+var _require = require('../models/mensajes'),
+  mensajesModel = _require.mensajesModel;
+var _require2 = require('normalizr'),
+  normalize = _require2.normalize,
+  denormalize = _require2.denormalize,
+  schema = _require2.schema;
+var _require3 = require('mongoose'),
+  Schema = _require3.Schema;
+var autor = new schema.Entity('autor', {}, {
+  idAttribute: 'id'
+});
+var msj = new schema.Entity('mensaje', {
+  autor: autor
+}, {
+  idAttribute: '_id'
+});
+var msjSchema = new schema.Array(msj);
 var Contenedor = /*#__PURE__*/function () {
-  function Contenedor(nombre) {
+  function Contenedor() {
     _classCallCheck(this, Contenedor);
-    this.nombre = nombre;
   }
   _createClass(Contenedor, [{
     key: "getAll",
     value: function () {
-      var _getAll = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var viewsFolderPath, contenido, data;
+      var _getAll = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(req, res) {
+        var mensajes;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.prev = 0;
-                viewsFolderPath = path.resolve(__dirname, '../../mensajes.json');
-                _context.next = 4;
-                return fs.promises.readFile(viewsFolderPath, "utf-8");
-              case 4:
-                contenido = _context.sent;
-                data = JSON.parse(contenido);
-                return _context.abrupt("return", data);
+                _context.next = 3;
+                return mensajesModel.find().lean();
+              case 3:
+                mensajes = _context.sent;
+                if (mensajes) {
+                  _context.next = 6;
+                  break;
+                }
+                return _context.abrupt("return", res.status(400).json({
+                  mensaje: "No hay mensajes"
+                }));
+              case 6:
+                res.status(200).json({
+                  data: mensajes
+                });
+                _context.next = 12;
+                break;
               case 9:
                 _context.prev = 9;
                 _context.t0 = _context["catch"](0);
-                console.log('No se encontro el array de los mensajes', _context.t0);
+                res.status(500).json({
+                  error: _context.t0.message,
+                  stack: _context.t0.stack
+                });
               case 12:
               case "end":
                 return _context.stop();
@@ -43,66 +69,94 @@ var Contenedor = /*#__PURE__*/function () {
           }
         }, _callee, null, [[0, 9]]);
       }));
-      function getAll() {
+      function getAll(_x, _x2) {
         return _getAll.apply(this, arguments);
       }
       return getAll;
     }()
   }, {
-    key: "save",
+    key: "normalizedMessages",
     value: function () {
-      var _save = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(data) {
-        var viewsFolderPath, contenido, datos, nuevoMensaje, dato;
+      var _normalizedMessages = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(req, res) {
+        var mensajesOriginales, mensajesNormalizados;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.prev = 0;
-                viewsFolderPath = path.resolve(__dirname, '../../mensajes.json');
-                _context2.next = 4;
-                return fs.promises.readFile(viewsFolderPath, "utf8");
-              case 4:
-                contenido = _context2.sent;
-                datos = JSON.parse(contenido);
-                nuevoMensaje = {
-                  usuario: data.usuario,
-                  mensaje: data.mensaje,
-                  time: moment().format('L, h:mm a')
-                };
-                if (!(!data.usuario || !data.mensaje)) {
-                  _context2.next = 9;
-                  break;
-                }
-                throw new Error('Campos incompletos');
-              case 9:
-                datos.push(nuevoMensaje);
-                dato = JSON.stringify(datos, null, '\t');
-                _context2.next = 13;
-                return fs.promises.writeFile(viewsFolderPath, dato);
-              case 13:
-                console.log('Enviado');
-                _context2.next = 19;
+                _context2.next = 3;
+                return mensajesModel.find().lean();
+              case 3:
+                mensajesOriginales = _context2.sent;
+                mensajesNormalizados = normalize(mensajesOriginales, msjSchema);
+                res.status(200).json({
+                  data: mensajesNormalizados
+                });
+                _context2.next = 11;
                 break;
-              case 16:
-                _context2.prev = 16;
+              case 8:
+                _context2.prev = 8;
                 _context2.t0 = _context2["catch"](0);
-                console.log('Error al enviar el mensaje', _context2.t0);
-              case 19:
+                res.status(500).json({
+                  error: _context2.t0.message,
+                  stack: _context2.t0.stack
+                });
+              case 11:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, null, [[0, 16]]);
+        }, _callee2, null, [[0, 8]]);
       }));
-      function save(_x) {
-        return _save.apply(this, arguments);
+      function normalizedMessages(_x3, _x4) {
+        return _normalizedMessages.apply(this, arguments);
       }
-      return save;
+      return normalizedMessages;
+    }()
+  }, {
+    key: "denormalizedMessages",
+    value: function () {
+      var _denormalizedMessages = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(req, res) {
+        var mensajesOriginales, mensajesNormalizados, denormalizado;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.prev = 0;
+                _context3.next = 3;
+                return mensajesModel.find().lean();
+              case 3:
+                mensajesOriginales = _context3.sent;
+                mensajesNormalizados = normalize(mensajesOriginales, msjSchema);
+                denormalizado = denormalize(mensajesNormalizados.result, msjSchema, mensajesNormalizados.entities);
+                res.status(200).json({
+                  data: denormalizado
+                });
+                _context3.next = 12;
+                break;
+              case 9:
+                _context3.prev = 9;
+                _context3.t0 = _context3["catch"](0);
+                res.status(500).json({
+                  error: _context3.t0.message,
+                  stack: _context3.t0.stack
+                });
+              case 12:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, null, [[0, 9]]);
+      }));
+      function denormalizedMessages(_x5, _x6) {
+        return _denormalizedMessages.apply(this, arguments);
+      }
+      return denormalizedMessages;
     }()
   }]);
   return Contenedor;
 }();
-var contenedorMsj = new Contenedor('mensajes.json');
+var contenedorDBMongo = new Contenedor();
 module.exports = {
-  mensajesController: contenedorMsj
+  mensajesController: contenedorDBMongo
 };

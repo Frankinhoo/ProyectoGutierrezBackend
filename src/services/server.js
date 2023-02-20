@@ -6,13 +6,16 @@ const http = require('http');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const passport = require('passport');
 const MongoStore = require('connect-mongo');
 const { MONGO_CONNECTION_STRING } = require('../config/index');
+const { loginFunc, signUpFunc } = require('./auth');
 
 const app = express();
 
 const ttlSeconds = 180;
 
+//express-session
 const StoreOptions = {
     store: MongoStore.create({
         mongoUrl: MONGO_CONNECTION_STRING,
@@ -30,6 +33,15 @@ const StoreOptions = {
 
 app.use(cookieParser());
 app.use(session(StoreOptions));
+
+//indicamos que vamos a usar passport en todas nuestras rutas
+app.use(passport.initialize());
+
+//permitimos que passport pueda manipular las sessiones de nuestra app
+app.use(passport.session());
+
+passport.use('login', loginFunc);
+passport.use('signup', signUpFunc);
 
 
 const mainRouter = require('../routes/index');

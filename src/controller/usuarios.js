@@ -1,62 +1,55 @@
+const passport = require("passport");
 
-const usuarios = [
-    {
-        username: 'Pablo08',
-        password: 'AguanteBoca12'
-    },
-    {
-        username: 'Franco25',
-        password: 'MessiElMasGrande'
-    }
-]
+const passportOptions = {
+    badRequestMessage: "Problema con username / password!",
+};
 
 class Contenedor {
     constructor() {
     }
 
-    async loginPost(req, res) {
-        const { username, password } = req.body;
+    async signup(req, res, next) {
+        passport.authenticate('signup', passportOptions, (err, user, info) => {
+            if (err) {
+                return next(err);
+            }
+            if (!user) return res.status(401).json(info);
+            res.json({ msg: 'Registrado con exito!' });
+        })(req, res, next);
+    };
 
-        const index = usuarios.findIndex((aUser) => aUser.username === username && aUser.password === password);
-
-        if (index < 0)
-            res.status(401).json({ msg: 'No estas autorizado' });
-        else {
-            const user = usuarios[index];
-            req.session.info = {
-                loggedIn: true,
-                contador: 1,
-                username: user.username,
-            };
-            res.json({ msg: `Bienvenido!! ${user.username}` });
-        }
-    }
-
-    async loginGet(req, res) {
-        req.session.info.contador++;
-        res.json({
-            msg: `${req.session.info.username} ha visitado el sitio ${req.session.info.contador} veces`
-        });
+    async login(req, res, next) {
+        passport.authenticate('login', passportOptions, (err, user, info) => {
+            if (err) {
+                return next(err);
+            }
+            if (!user) return res.status(401).json(info);
+            res.json({ msg: "Bienvenido!", user: req.user });
+        })(req, res, next);
     }
 
     async logout(req, res) {
-        req.session.destroy((err) => {
-            if (!err) res.json({msg: 'Logout Ok!!'});
-            else res.send({ status: 'Logout ERROR', body: err });
+        req.logout(function (err) {
+            if (err) {
+                return next(err);
+            }
+            req.session.destroy((err) => {
+                if (err) {
+                    return next(err);
+                }
+            });
+            res.json({ msg: 'Hasta Luego!!' });
         });
-    }
+    };
 
     async info(req, res) {
-        res.json({
-            session: req.session,
-            sessionId: req.sessionID,
-            cookies: req.cookies
-        });
-    }
+        res.json(req.session);
+    };
+
 }
 
 const contenedorDBMongo = new Contenedor();
 
 module.exports = {
-    usuariosController: contenedorDBMongo
+    usuariosController: contenedorDBMongo,
 }
