@@ -1,4 +1,4 @@
-const server = require('./services/server');
+const { server } = require('./services/server');
 const { initWsServer, getWsServer } = require('./services/socket');
 const { PUERTO } = require('./config/index');
 const { DBService } = require('./services/db');

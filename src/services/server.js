@@ -10,6 +10,7 @@ const passport = require('passport');
 const MongoStore = require('connect-mongo');
 const { MONGO_CONNECTION_STRING } = require('../config/index');
 const { loginFunc, signUpFunc } = require('./auth');
+const minimist = require('minimist')
 
 const app = express();
 
@@ -30,6 +31,19 @@ const StoreOptions = {
         maxAge: ttlSeconds * 1000
     },
 };
+
+//Configuracion MINIMIST
+const optionalArgsObject = {
+    alias: {
+        p: 'puerto',
+    },
+    default: {
+        p: '8080',
+    },
+};
+
+const args = minimist(process.argv, optionalArgsObject);
+
 
 app.use(cookieParser());
 app.use(session(StoreOptions));
@@ -69,4 +83,7 @@ app.get('/', async (req, res) => {
 });
 
 
-module.exports = server;
+module.exports = {
+    server,
+    args,
+};
