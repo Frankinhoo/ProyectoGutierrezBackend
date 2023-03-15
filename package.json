@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && node dist/index.js",
     "dev": "nodemon babel-node src/index.js",
+    "prod": "pm2 start ecosystem.config.js",
+    "stop": "pm2 stop all",
+    "list":"pm2 list all",
     "build": "babel src --out-dir dist"
   },
   "repository": {
@@ -44,6 +47,7 @@
     "normalizr": "^3.6.2",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
+    "pm2": "^5.2.2",
     "socket.io": "^4.5.3",
     "sqlite3": "^5.1.2"
   }

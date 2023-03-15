@@ -43,7 +43,7 @@ const optionalArgsObject = {
 };
 
 const args = minimist(process.argv, optionalArgsObject);
-
+const PUERTO = args.puerto || 8080;
 
 app.use(cookieParser());
 app.use(session(StoreOptions));
@@ -80,6 +80,28 @@ app.use('/api', mainRouter);
 app.get('/', async (req, res) => {
     const productos = await productosController.getAll();
     res.render('index', {productos})
+});
+
+//BORRAR DESPUES 
+app.get('/api/randoms', (req, res) => {
+    console.log('Resolving / endpoint');
+    res.json({
+        pid: process.pid,
+        msg: `Hola desde puerto ${PUERTO}`,
+    });
+});
+
+app.get('/slow', (req, res) => {
+    console.log(`PID => ${process.pid} will work slow`);
+    let sum = 0;
+    for (let i = 0; i < 6e9; i++) {
+        sum += i;
+    }
+    res.json({
+        pid: process.pid,
+        msg: `Hola desde puerto ${PUERTO}`,
+        sum,
+    });
 });
 
 
