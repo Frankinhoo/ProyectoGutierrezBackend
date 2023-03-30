@@ -22,7 +22,12 @@ var _require4 = require('../config/index'),
 var _require5 = require('./auth'),
   loginFunc = _require5.loginFunc,
   signUpFunc = _require5.signUpFunc;
+var minimist = require('minimist');
+var compression = require('compression');
+var data = require('../dataCompres');
+var log4js = require('log4js');
 var app = express();
+app.use(compression());
 var ttlSeconds = 180;
 
 //express-session
@@ -40,6 +45,18 @@ var StoreOptions = {
     maxAge: ttlSeconds * 1000
   }
 };
+
+//Configuracion MINIMIST
+var optionalArgsObject = {
+  alias: {
+    p: 'puerto'
+  },
+  "default": {
+    p: '8080'
+  }
+};
+var args = minimist(process.argv, optionalArgsObject);
+var PUERTO = args.puerto || 8080;
 app.use(cookieParser());
 app.use(session(StoreOptions));
 
@@ -91,4 +108,77 @@ app.get('/', /*#__PURE__*/function () {
     return _ref.apply(this, arguments);
   };
 }());
-module.exports = server;
+
+//LOGGERS
+log4js.configure({
+  appenders: {
+    console: {
+      type: 'console'
+    },
+    fileAppenderWarn: {
+      type: 'file',
+      filename: './logs/warn.log'
+    },
+    fileAppenderError: {
+      type: 'file',
+      filename: './logs/error.log'
+    }
+  },
+  categories: {
+    "default": {
+      appenders: ['console'],
+      level: 'info'
+    },
+    myLoggerWarn: {
+      appenders: ['fileAppenderWarn'],
+      level: 'warn'
+    },
+    myLoggerError: {
+      appenders: ['fileAppenderError'],
+      level: 'error'
+    }
+  }
+});
+var logger = log4js.getLogger();
+
+// app.use((req, res) => {
+//     logger.warn(`${req.url}`);
+//     logger.info(`${req.route} - ${req.method}`);
+//     return res.status(404).json({
+//         descripcion: `ruta ${req.url} no existente`,
+//     });
+// });
+
+//BORRAR DESPUES 
+app.get('/api/randoms', function (req, res) {
+  logger.info("".concat(req.route, " - ").concat(req.method));
+  logger.info("IMPRIMIMOS LOGGER INFO");
+  res.json({
+    pid: process.pid,
+    msg: "Hola desde puerto ".concat(PUERTO)
+  });
+});
+
+//BORRAR DESPUES
+app.get('/slow', function (req, res) {
+  logger.info("".concat(req.route, " - ").concat(req.method));
+  var sum = 0;
+  for (var i = 0; i < 6e9; i++) {
+    sum += i;
+  }
+  res.json({
+    pid: process.pid,
+    msg: "Hola desde puerto ".concat(PUERTO),
+    sum: sum
+  });
+});
+
+//BORRAR DESPUES
+app.get('/gzip', function (req, res) {
+  logger.info("".concat(req.route, " - ").concat(req.method));
+  res.send(data);
+});
+module.exports = {
+  server: server,
+  args: args
+};

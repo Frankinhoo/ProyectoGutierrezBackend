@@ -129,5 +129,5 @@ class Contenedor{
 const contenedorDBMongo = new Contenedor();
 
 module.exports = {
-    mongoDBController: contenedorDBMongo
+    productosController: contenedorDBMongo
 }

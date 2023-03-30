@@ -1,20 +1,20 @@
 const { Router } = require('express');
 const { checkBodyProduct } = require('../middleware/productos');
-const { mongoDBController } = require('../controller/productos');
+const { productosController } = require('../controller/productos');
 
 
 const rutaProductos = Router();
 
-rutaProductos.get('/test', mongoDBController.getAllFaker) //Eliminar despues 
+rutaProductos.get('/test', productosController.getAllFaker) //Eliminar despues 
 
-rutaProductos.get('/', mongoDBController.getAll);
+rutaProductos.get('/', productosController.getAll);
 
-rutaProductos.get('/:id', mongoDBController.getById);
+rutaProductos.get('/:id', productosController.getById);
 
-rutaProductos.post('/', checkBodyProduct, mongoDBController.create);
+rutaProductos.post('/', checkBodyProduct, productosController.create);
 
-rutaProductos.put('/:id', checkBodyProduct, mongoDBController.update);
+rutaProductos.put('/:id', checkBodyProduct, productosController.update);
 
-rutaProductos.delete('/:id', mongoDBController.delete);
+rutaProductos.delete('/:id', productosController.delete);
 
-module.exports = rutaProductos;
+module.exports = rutaProductos; 

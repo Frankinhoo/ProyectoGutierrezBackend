@@ -10,9 +10,14 @@ const passport = require('passport');
 const MongoStore = require('connect-mongo');
 const { MONGO_CONNECTION_STRING } = require('../config/index');
 const { loginFunc, signUpFunc } = require('./auth');
-const minimist = require('minimist')
+const minimist = require('minimist');
+const compression = require('compression');
+const data = require('../dataCompres');
+const log4js = require('log4js');
 
 const app = express();
+
+app.use(compression());
 
 const ttlSeconds = 180;
 
@@ -82,17 +87,41 @@ app.get('/', async (req, res) => {
     res.render('index', {productos})
 });
 
+//LOGGERS
+log4js.configure({
+    appenders: {
+        console: { type: 'console' },
+        appWarn: { type: 'file', filename: './logs/warn.log' },
+        appError: { type: 'file', filename: './logs/error.log' },
+    },
+    categories: {
+        default: { appenders: ['console'], level: 'info' },
+        catA: { appenders: ['console'], level: 'warn' },
+        "catA.Warn": { appenders: ['appWarn'], level: 'warn' },
+        "catA.Error": { appenders: ['appError'], level: 'error' },
+    },
+});
+
+const logger = log4js.getLogger();
+const loggerA = log4js.getLogger("catA.Warn");
+const loggerB = log4js.getLogger("catA.Error");
+
+
+
 //BORRAR DESPUES 
 app.get('/api/randoms', (req, res) => {
-    console.log('Resolving / endpoint');
+    logger.info(`${req.url} - ${req.method}`);
+    loggerA.warn(`IMPRIMIMOS LOS WARNING`);
+    loggerB.error(`IMPRIMIMOS LOS ERRORES`);
     res.json({
         pid: process.pid,
         msg: `Hola desde puerto ${PUERTO}`,
     });
 });
 
+//BORRAR DESPUES
 app.get('/slow', (req, res) => {
-    console.log(`PID => ${process.pid} will work slow`);
+    logger.info(`${req.url} - ${req.method}`);
     let sum = 0;
     for (let i = 0; i < 6e9; i++) {
         sum += i;
@@ -104,6 +133,39 @@ app.get('/slow', (req, res) => {
     });
 });
 
+//BORRAR DESPUES
+app.get('/gzip', (req, res) => {
+    logger.info(`${req.url} - ${req.method}`);
+    res.send(data);
+});
+
+
+//BORRAR DESPUES
+app.get('/info', (req, res) => {
+    try {
+        const finalObject = {
+            directorioActual: process.cwd(),
+            idProceso: process.pid,
+            versionNode: process.version,
+            tituloProceso: process.title,
+            sistemaOperativo: process.platform,
+            usoMemoria: process.memoryUsage(),
+        };
+        console.log(finalObject);
+        res.status(200).json({
+            data: finalObject,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message, stack: error.stack });
+    }
+});
+
+app.use((req, res) => {
+    loggerA.warn(`${req.url} - ${req.method}`);
+    return res.status(404).json({
+        descripcion: `ruta ${req.url} no existente`,
+    });
+});
 
 module.exports = {
     server,
