@@ -1,0 +1,358 @@
+openapi: 3.0.0
+info:
+  title: API Docs Franco Gutierrez
+  description: Documentacion de API con swagger
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Local server
+  - url: proyectogutierrezbackend-production.up.railway.app
+    description: Server railway
+
+components:
+  schemas:
+    Producto:
+      type: object
+      required:
+        - producto
+        - marca
+        - precio
+        - stock
+      properties:
+        producto:
+          type: string
+          description: Nombre del Producto
+        marca:
+          type: string
+          description: Marca del producto
+        precio:
+          type: number
+          description: Precio del producto en pesos argentinos
+        stock:
+          type: number
+          description: Unidades en stock del producto
+      example:
+        producto: VaporMax
+        marca: Nike
+        precio: 50000
+        stock: 25
+    Usuario:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: Nombre del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+      example:
+        username: Pepito84
+        password: pikachu777
+    Carrito:
+      type: object
+      properties:
+        timestamps:
+          type: string
+          description: Tiempo de creacion del carrito
+        productos:
+          type: array
+          items:
+            type: object
+            description: Array
+            properties:
+              0:
+                type: object
+                description: Objeto del Array
+                properties:
+                  producto:
+                    type: string
+                    description: Nombre del Producto
+                  marca:
+                    type: string
+                    description: Marca del Producto
+                  precio:
+                    type: number
+                    description: Precio del producto en pesos argentinos
+                  stock:
+                    type: number
+                    description: Precio del producto en pesos argentinos
+              1:
+                type: object
+                description: Objeto del Array
+                properties:
+                  producto:
+                    type: string
+                    description: Nombre del Producto
+                  marca:
+                    type: string
+                    description: Marca del Producto
+                  precio:
+                    type: number
+                    description: Precio del producto en pesos argentinos
+                  stock:
+                    type: number
+                    description: Precio del producto en pesos argentinos
+      example:
+        timestamps: "04-12-22 21:12:52"
+        productos:
+          - producto: "VaporMax"
+            marca: "Nike"
+            precio: 50000
+            stock: 25
+          - producto: "Ozelia"
+            marca: "Adidas"
+            precio: 40000
+            stock: 20
+          - producto: "Ozweego"
+            marca: "Adidas"
+            precio: 30000
+            stock: 50
+    CarritoId:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: ID del producto
+      example:
+        id: 638f9a7b52442f21c38h0466
+
+paths:
+  /productos:
+    get:
+      summary: Devuelve todos los productos disponibles.
+      tags:
+        - Productos
+      responses:
+        '200':
+          description: Productos Disponibles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Producto'
+    post:
+      summary: Crea un producto.
+      tags:
+      - Productos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Producto'
+      responses: 
+        '201':
+          description: Creado.
+  /productos/{productoId}:
+    get:
+      summary: Retorna un producto por ID.
+      tags:
+        - Productos
+      parameters:
+        - name: productoId
+          in: path
+          required: true
+          description: ID Del producto que queremos.
+          schema:
+            type : string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+    put:
+      summary: Actualiza un producto por ID.
+      tags:
+        - Productos
+      parameters:
+        - name: productoId
+          in: path
+          required: true
+          description: ID Del producto que queremos actualizar.
+          schema:
+            type : string
+      responses:
+        '200':
+          description: Producto Actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+    delete:
+      summary: Elimina un producto por ID.
+      tags:
+        - Productos
+      parameters:
+        - name: productoId
+          in: path
+          required: true
+          description: ID Del producto que queremos eliminar.
+          schema:
+            type : string
+      responses:
+        '200':
+          description: OK
+  /productos/test:
+    get:
+      summary: Obtiene 5 productos falsos.
+      tags:
+        - Productos
+      responses:
+        '200':
+          description: Every product available.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Producto'
+  /usuarios/signup:
+    post:
+      summary: Registra un usuario.
+      tags:
+      - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Usuario'
+      responses: 
+        '201':
+          description: Creado.
+  /usuarios/login:
+    post:
+      summary: Accede a la sesion de un usuario registrado.
+      tags:
+      - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Usuario'
+      responses: 
+        '201':
+          description: Creado.
+  /usuarios/info:
+    get:
+      summary: Devuelve informacion de la sesion del usuario.
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Informacion de sesion.
+  /usuarios/logout:
+    get:
+      summary: Desloguea la sesion del usuario.
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Deslogueo de sesion.
+  /carrito:
+    get:
+      summary: Devuelve todos los carritos disponibles.
+      tags:
+        - Carritos
+      responses:
+        '200':
+          description: Todos los carritos disponibles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Carrito'
+    post:
+      summary: Crea un nuevo carrito.
+      description: No Necesita un request body
+      tags:
+      - Carritos
+      responses: 
+        '201':
+          description: Creado.
+  /carrito/{carritoId}/productos:
+    post:
+      summary: Agrega un producto con ID de carrito.
+      description: El producto se agrega con ID en request body
+      tags:
+        - Carritos
+      parameters:
+        - name: carritoId
+          in: path
+          required: true
+          description: ID Del carrito que queremos.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/CarritoId'
+      responses: 
+        '201':
+          description: Creado.
+    get:
+      summary: Retorna un carrito por ID con los productos cargados.
+      tags:
+        - Carritos
+      parameters:
+        - name: carritoId
+          in: path
+          required: true
+          description: ID Del carrito que queremos.
+          schema:
+            type : string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrito'
+  /carrito/{carritoId}:
+    delete:
+      summary: Elimina un carrito por ID.
+      tags:
+        - Carritos
+      parameters:
+        - name: carritoId
+          in: path
+          required: true
+          description: ID Del carrito que queremos.
+          schema:
+            type : string
+      responses:
+        '200':
+          description: OK
+  /carrito/{carritoId}/productos/{productoId}:
+    delete:
+      summary: Elimina un producto por ID de un carrito especifico.
+      tags:
+        - Carritos
+      parameters:
+        - name: carritoId
+          in: path
+          required: true
+          description: ID Del carrito que queremos elimiar.
+          schema:
+            type : string
+        - name: productoId
+          in: path
+          required: true
+          description: ID Del Producto que queremos eliminar.
+          schema:
+            type : string
+      responses:
+        '200':
+          description: OK

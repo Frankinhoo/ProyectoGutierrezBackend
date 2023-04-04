@@ -5,7 +5,7 @@ const db = require('../knexfile');
 
 class Contenedor {
     constructor() {
-        const environment = process.env.NODE_ENV || 'development';
+        const environment = process.env.DB_ENV || 'development';
         console.log(`SETTING ${environment} DB`);
         const options = db[environment];
         this.connection = knex({

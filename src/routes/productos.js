@@ -5,7 +5,7 @@ const { productosController } = require('../controller/productos');
 
 const rutaProductos = Router();
 
-rutaProductos.get('/test', productosController.getAllFaker) //Eliminar despues 
+rutaProductos.get('/test', productosController.getAllFaker)
 
 rutaProductos.get('/', productosController.getAll);
 

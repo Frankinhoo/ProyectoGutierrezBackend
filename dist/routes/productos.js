@@ -5,13 +5,13 @@ var _require = require('express'),
 var _require2 = require('../middleware/productos'),
   checkBodyProduct = _require2.checkBodyProduct;
 var _require3 = require('../controller/productos'),
-  mongoDBController = _require3.mongoDBController;
+  productosController = _require3.productosController;
 var rutaProductos = Router();
-rutaProductos.get('/test', mongoDBController.getAllFaker); //Eliminar despues 
+rutaProductos.get('/test', productosController.getAllFaker); //Eliminar despues 
 
-rutaProductos.get('/', mongoDBController.getAll);
-rutaProductos.get('/:id', mongoDBController.getById);
-rutaProductos.post('/', checkBodyProduct, mongoDBController.create);
-rutaProductos.put('/:id', checkBodyProduct, mongoDBController.update);
-rutaProductos["delete"]('/:id', mongoDBController["delete"]);
+rutaProductos.get('/', productosController.getAll);
+rutaProductos.get('/:id', productosController.getById);
+rutaProductos.post('/', checkBodyProduct, productosController.create);
+rutaProductos.put('/:id', checkBodyProduct, productosController.update);
+rutaProductos["delete"]('/:id', productosController["delete"]);
 module.exports = rutaProductos;

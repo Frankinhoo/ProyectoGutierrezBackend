@@ -115,11 +115,11 @@ log4js.configure({
     console: {
       type: 'console'
     },
-    fileAppenderWarn: {
+    appWarn: {
       type: 'file',
       filename: './logs/warn.log'
     },
-    fileAppenderError: {
+    appError: {
       type: 'file',
       filename: './logs/error.log'
     }
@@ -129,30 +129,29 @@ log4js.configure({
       appenders: ['console'],
       level: 'info'
     },
-    myLoggerWarn: {
-      appenders: ['fileAppenderWarn'],
+    catA: {
+      appenders: ['console'],
       level: 'warn'
     },
-    myLoggerError: {
-      appenders: ['fileAppenderError'],
+    "catA.Warn": {
+      appenders: ['appWarn'],
+      level: 'warn'
+    },
+    "catA.Error": {
+      appenders: ['appError'],
       level: 'error'
     }
   }
 });
 var logger = log4js.getLogger();
-
-// app.use((req, res) => {
-//     logger.warn(`${req.url}`);
-//     logger.info(`${req.route} - ${req.method}`);
-//     return res.status(404).json({
-//         descripcion: `ruta ${req.url} no existente`,
-//     });
-// });
+var loggerA = log4js.getLogger("catA.Warn");
+var loggerB = log4js.getLogger("catA.Error");
 
 //BORRAR DESPUES 
 app.get('/api/randoms', function (req, res) {
-  logger.info("".concat(req.route, " - ").concat(req.method));
-  logger.info("IMPRIMIMOS LOGGER INFO");
+  logger.info("".concat(req.url, " - ").concat(req.method));
+  loggerA.warn("IMPRIMIMOS LOS WARNING");
+  loggerB.error("IMPRIMIMOS LOS ERRORES");
   res.json({
     pid: process.pid,
     msg: "Hola desde puerto ".concat(PUERTO)
@@ -161,7 +160,7 @@ app.get('/api/randoms', function (req, res) {
 
 //BORRAR DESPUES
 app.get('/slow', function (req, res) {
-  logger.info("".concat(req.route, " - ").concat(req.method));
+  logger.info("".concat(req.url, " - ").concat(req.method));
   var sum = 0;
   for (var i = 0; i < 6e9; i++) {
     sum += i;
@@ -175,8 +174,37 @@ app.get('/slow', function (req, res) {
 
 //BORRAR DESPUES
 app.get('/gzip', function (req, res) {
-  logger.info("".concat(req.route, " - ").concat(req.method));
+  logger.info("".concat(req.url, " - ").concat(req.method));
   res.send(data);
+});
+
+//BORRAR DESPUES
+app.get('/info', function (req, res) {
+  try {
+    var finalObject = {
+      directorioActual: process.cwd(),
+      idProceso: process.pid,
+      versionNode: process.version,
+      tituloProceso: process.title,
+      sistemaOperativo: process.platform,
+      usoMemoria: process.memoryUsage()
+    };
+    console.log(finalObject);
+    res.status(200).json({
+      data: finalObject
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+app.use(function (req, res) {
+  loggerA.warn("".concat(req.url, " - ").concat(req.method));
+  return res.status(404).json({
+    descripcion: "ruta ".concat(req.url, " no existente")
+  });
 });
 module.exports = {
   server: server,

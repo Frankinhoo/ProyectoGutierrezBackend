@@ -53,6 +53,8 @@
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "socket.io": "^4.5.3",
-    "sqlite3": "^5.1.2"
+    "sqlite3": "^5.1.2",
+    "swagger-ui-express": "^4.6.2",
+    "yamljs": "^0.3.0"
   }
 }

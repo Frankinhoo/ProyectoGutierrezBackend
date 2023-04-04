@@ -12,8 +12,9 @@ const { MONGO_CONNECTION_STRING } = require('../config/index');
 const { loginFunc, signUpFunc } = require('./auth');
 const minimist = require('minimist');
 const compression = require('compression');
-const data = require('../dataCompres');
 const log4js = require('log4js');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 const app = express();
 
@@ -106,66 +107,12 @@ const logger = log4js.getLogger();
 const loggerA = log4js.getLogger("catA.Warn");
 const loggerB = log4js.getLogger("catA.Error");
 
+//SWAGGER
+const swaggerPath = path.resolve(__dirname, '../../swagger.yml');
+const swaggerDoc = YAML.load(swaggerPath);
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
-//BORRAR DESPUES 
-app.get('/api/randoms', (req, res) => {
-    logger.info(`${req.url} - ${req.method}`);
-    loggerA.warn(`IMPRIMIMOS LOS WARNING`);
-    loggerB.error(`IMPRIMIMOS LOS ERRORES`);
-    res.json({
-        pid: process.pid,
-        msg: `Hola desde puerto ${PUERTO}`,
-    });
-});
-
-//BORRAR DESPUES
-app.get('/slow', (req, res) => {
-    logger.info(`${req.url} - ${req.method}`);
-    let sum = 0;
-    for (let i = 0; i < 6e9; i++) {
-        sum += i;
-    }
-    res.json({
-        pid: process.pid,
-        msg: `Hola desde puerto ${PUERTO}`,
-        sum,
-    });
-});
-
-//BORRAR DESPUES
-app.get('/gzip', (req, res) => {
-    logger.info(`${req.url} - ${req.method}`);
-    res.send(data);
-});
-
-
-//BORRAR DESPUES
-app.get('/info', (req, res) => {
-    try {
-        const finalObject = {
-            directorioActual: process.cwd(),
-            idProceso: process.pid,
-            versionNode: process.version,
-            tituloProceso: process.title,
-            sistemaOperativo: process.platform,
-            usoMemoria: process.memoryUsage(),
-        };
-        console.log(finalObject);
-        res.status(200).json({
-            data: finalObject,
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message, stack: error.stack });
-    }
-});
-
-app.use((req, res) => {
-    loggerA.warn(`${req.url} - ${req.method}`);
-    return res.status(404).json({
-        descripcion: `ruta ${req.url} no existente`,
-    });
-});
 
 module.exports = {
     server,

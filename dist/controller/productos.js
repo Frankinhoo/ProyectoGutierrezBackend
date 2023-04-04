@@ -277,5 +277,5 @@ var Contenedor = /*#__PURE__*/function () {
 }();
 var contenedorDBMongo = new Contenedor();
 module.exports = {
-  mongoDBController: contenedorDBMongo
+  productosController: contenedorDBMongo
 };

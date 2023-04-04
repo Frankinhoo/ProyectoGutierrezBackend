@@ -4,7 +4,7 @@ const { PUERTO } = require('./config/index');
 const { DBService } = require('./services/db');
 const { initMongoDB } = require('./services/database');
 
-const puerto = PUERTO
+const puerto = process.env.PORT || PUERTO
 // DBService.init();
 
 const init = async () => {
